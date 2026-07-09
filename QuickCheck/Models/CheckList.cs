@@ -1,3 +1,5 @@
+using QuickCheck.Interfaces;
+
 namespace QuickCheck.Models;
 
 public class CheckList
@@ -6,5 +8,31 @@ public class CheckList
     public string Description { get; set; } = string.Empty;
     public string? ProviderUrl { get; set; }
     public ProviderType ProviderType { get; set; } = ProviderType.None;
-    public List<VIPPlayer> VipPlayers { get; set; } = [];
+    public List<VIPPlayer> VipPlayers { get; private set; } = [];
+
+    public async Task UpdateCheckList()
+    {
+        try
+        {
+            switch (ProviderType)
+            {
+                case ProviderType.None:
+                    break;
+                case ProviderType.GoogleDoc:
+                    var googleDocProvider = new GoogleDocProvider();
+                    VipPlayers = await googleDocProvider.GetPlayers(ProviderUrl ?? string.Empty);
+                    break;
+                case ProviderType.GoogleSheet:
+                    var googleSheetProvider = new GoogleSheetsProvider();
+                    VipPlayers = await googleSheetProvider.GetPlayers(ProviderUrl ?? string.Empty);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        catch (Exception ex)
+        {
+            Services.Log.Error($"Error updating checklist '{Name}': {ex.Message}");
+        }
+    }
 }

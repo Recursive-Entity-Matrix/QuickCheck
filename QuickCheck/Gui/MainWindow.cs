@@ -66,7 +66,7 @@ public class MainWindow : Window
 
             if (ImGui.Button("Sync Remote Provider"))
             {
-                //TODO
+                Task.Run(list.UpdateCheckList);
             }
             ImGui.SameLine();
             if (ImGui.Button("Open Remote Provider"))
@@ -79,7 +79,7 @@ public class MainWindow : Window
         {
             if (ImGui.Button("Add New VIP"))
             {
-                //TODO
+                list.VipPlayers.Add(new VIPPlayer());
             }
         }
 
@@ -104,12 +104,19 @@ public class MainWindow : Window
                     player.Name = name;
                     _config.Save();
                 }
-                ImGui.SameLine();
-                int homeWorld = (int)player.HomeWorld;
-                if (ImGui.Combo("Home World", ref homeWorld, ServerHelper.GetWorlds()))
+                var worldNames = ServerHelper.Worlds.Select(x => x.Name.ToString()).ToList();
+                
+                int homeWorldIndex = ServerHelper.Worlds.FindIndex(x => x.RowId == player.HomeWorld);
+                if (homeWorldIndex < 0)
+                    homeWorldIndex = 0;
+
+                if (ImGui.Combo("Home World", ref homeWorldIndex, worldNames))
                 {
-                    player.HomeWorld = (uint)homeWorld;
-                    _config.Save();
+                    if (homeWorldIndex >= 0 && homeWorldIndex < ServerHelper.Worlds.Count)
+                    {
+                        player.HomeWorld = ServerHelper.Worlds[homeWorldIndex].RowId;
+                        _config.Save();
+                    }
                 }
 
                 if (ImGui.Button("Remove"))

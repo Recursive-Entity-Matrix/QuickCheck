@@ -1,4 +1,5 @@
 using Lumina.Excel.Sheets;
+using Lumina.Extensions;
 
 namespace QuickCheck.Util;
 
@@ -6,13 +7,11 @@ public static class ServerHelper
 {
     static ServerHelper()
     {
-        WorldsById = Services.Data.GameData.GetExcelSheet<World>()?.ToDictionary(x => x.RowId, x => x.Name.ToString()) ?? new Dictionary<uint, string>();
+        Worlds = Services.Data.GameData.GetExcelSheet<World>()?.Where(x => x.IsPublic).ToList()!;
     }
 
-    private static readonly Dictionary<uint, string> WorldsById;
+    public static readonly List<World> Worlds;
     
-    public static List<string> GetWorlds() => WorldsById.Values.ToList();
-    
-    public static string GetNameFromId(uint id) => WorldsById.GetValueOrDefault(id, "Unknown");
-    public static uint GetIdFromName(string name) => WorldsById.FirstOrDefault(x => x.Key.ToString().Equals(name, StringComparison.OrdinalIgnoreCase)).Key;
+    public static string GetNameFromId(uint id) => Worlds.FirstOrNull(x => x.RowId == id).ToString() ?? string.Empty;
+    public static uint GetIdFromName(string name) => Worlds.FirstOrNull(x => x.Name.ToString().Equals(name, StringComparison.OrdinalIgnoreCase))?.RowId ?? 0;
 }

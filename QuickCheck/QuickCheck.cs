@@ -1,4 +1,6 @@
-﻿using Dalamud.Game.Gui.ContextMenu;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.Gui.ContextMenu;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
@@ -29,10 +31,9 @@ public class QuickCheck : IDalamudPlugin
         
         SeStringBuilder builder = new();
         var seString = builder.AddText("Check The List").Build();
-        
-        var targetName = target.TargetName;
-        var targetHomeWorld  = target.TargetHomeWorld.RowId;
-        if (string.IsNullOrEmpty(targetName) || targetHomeWorld == 0) return;
+
+        var obj = Services.Objects.SearchById(target.TargetObjectId);
+        if (obj is not IPlayerCharacter pc) return;
         
         var checkItem = new MenuItem()
         {
@@ -42,14 +43,14 @@ public class QuickCheck : IDalamudPlugin
             PrefixColor = 526,
             OnClicked = (a) =>
             {
-                var found = _config.CheckLists.FirstOrDefault(x => x.VipPlayers.Any(v => v.Name == targetName && v.HomeWorld == targetHomeWorld));
+                var found = _config.CheckLists.FirstOrDefault(x => x.VipPlayers.Any(v => v.Name == pc.Name.TextValue && v.HomeWorld == pc.HomeWorld.RowId));
                 if (found != null)
                 {
-                    Services.ChatGui.Print($"[Quick Check] {targetName} is on the VIP list! ({found.Name})");
+                    Services.ChatGui.Print($"[Quick Check] {pc.Name.TextValue} is on the VIP list! ({found.Name})");
                 }
                 else
                 {
-                    Services.ChatGui.PrintError($"[Quick Check] {targetName} is not any VIP list!");
+                    Services.ChatGui.PrintError($"[Quick Check] {pc.Name.TextValue} is not any VIP list!");
                 }
             }
         };

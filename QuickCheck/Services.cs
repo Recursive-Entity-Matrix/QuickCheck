@@ -14,4 +14,5 @@ public class Services
     [PluginService] public static ICondition Condition { get; set; } = null!;
     [PluginService] public static IDataManager Data { get; set; } = null!;
     [PluginService] public static IContextMenu ContextMenu { get; set; } = null!;
+    [PluginService] public static IObjectTable Objects { get; set; } = null!;
 }

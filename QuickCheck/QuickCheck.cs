@@ -43,14 +43,14 @@ public class QuickCheck : IDalamudPlugin
             PrefixColor = 526,
             OnClicked = (a) =>
             {
-                var found = _config.CheckLists.FirstOrDefault(x => x.VipPlayers.Any(v => v.Name == pc.Name.TextValue && v.HomeWorld == pc.HomeWorld.RowId));
-                if (found != null)
+                var found = _config.CheckLists.Where(x => x.VipPlayers.Any(v => v.Name == pc.Name.TextValue && v.HomeWorld == pc.HomeWorld.RowId)).ToList();
+                if (found.Count > 0)
                 {
-                    Services.ChatGui.Print($"[Quick Check] {pc.Name.TextValue} is on the VIP list! ({found.Name})");
+                    Services.ChatGui.Print($"[Quick Check] {pc.Name.TextValue} is on the VIP list! ({string.Join(", ", found.Select(x => x.Name))})");
                 }
                 else
                 {
-                    Services.ChatGui.PrintError($"[Quick Check] {pc.Name.TextValue} is not any VIP list!");
+                    Services.ChatGui.PrintError($"[Quick Check] {pc.Name.TextValue} is not on any VIP list!");
                 }
             }
         };

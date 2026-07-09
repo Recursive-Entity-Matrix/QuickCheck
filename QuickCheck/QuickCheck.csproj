@@ -1,0 +1,17 @@
+﻿<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="QuickCheck.json" />
+    </ItemGroup>
+
+</Project>

@@ -17,6 +17,8 @@ public class MainWindow : Window
     {
         _config = config;
         _listSelector = new ListSelector(_config);
+        Size = new Vector2(800, 600);
+        SizeCondition = ImGuiCond.FirstUseEver;
     }
 
     public override void Draw()

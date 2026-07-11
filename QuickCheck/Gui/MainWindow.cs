@@ -58,7 +58,7 @@ public class MainWindow : Window
         }
         ImGuiUtil.HoverTooltip(@"Connect the list to a remote provider to sync the list between multiple people." + Environment.NewLine
                               + "If using a Google Sheet, the sheet must contain a column named 'Player Name'. Additional columns are allowed and will not be parsed." + Environment.NewLine
-                              + "If using a Google Doc, the doc must contain a list of player names, one per line."  + Environment.NewLine
+                              + "If using a Google Doc, Pastebin, or GitHub, the doc must contain a list of player names, one per line."  + Environment.NewLine
                               + "Both must have the names listed in the format 'Player Name@World'" + Environment.NewLine
                               + "Example: Thancred Waters@Kraken" + Environment.NewLine
                               + "NOTE: Using this option will disable the ability to edit the list locally.");

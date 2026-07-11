@@ -8,6 +8,11 @@ public class Config : IPluginConfiguration
 {
     public int Version { get; set; } = 1;
     public List<CheckList> CheckLists { get; set; } = [];
+    public bool PlayChatSounds { get; set; } = true;
+    public uint SuccessSound { get; set; } = 3;
+    public uint ErrorSound { get; set; } = 11;
+    public uint AutoUpdateMinutes {get; set;} = 15;
+    public bool UpdateOnStartup { get; set; } = true;
 
     public void Save()
     {
@@ -23,7 +28,8 @@ public class Config : IPluginConfiguration
         {
             return new Config();
         }
+
         var json = File.ReadAllText(path);
-        return JsonConvert.DeserializeObject<Config>(json) ??  new Config();
+        return JsonConvert.DeserializeObject<Config>(json) ?? new Config();
     }
 }

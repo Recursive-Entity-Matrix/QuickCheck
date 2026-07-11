@@ -15,4 +15,6 @@ public class Services
     [PluginService] public static IDataManager Data { get; set; } = null!;
     [PluginService] public static IContextMenu ContextMenu { get; set; } = null!;
     [PluginService] public static IObjectTable Objects { get; set; } = null!;
+    [PluginService] public static ITargetManager TargetManager { get; set; } = null!;
+    [PluginService] public static IFramework Framework { get; set; } = null!;
 }

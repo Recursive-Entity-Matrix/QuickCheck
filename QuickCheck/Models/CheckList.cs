@@ -26,6 +26,14 @@ public class CheckList
                     var googleSheetProvider = new GoogleSheetsProvider();
                     VipPlayers = await googleSheetProvider.GetPlayers(ProviderUrl ?? string.Empty);
                     break;
+                case ProviderType.Pastebin:
+                    var pastebinProvider = new PastebinProvider();
+                    VipPlayers = await pastebinProvider.GetPlayers(ProviderUrl ?? string.Empty);
+                    break;
+                case ProviderType.GitHubGist:
+                    var githubGistProvider = new GitHubGistProvider();
+                    VipPlayers = await githubGistProvider.GetPlayers(ProviderUrl ?? string.Empty);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

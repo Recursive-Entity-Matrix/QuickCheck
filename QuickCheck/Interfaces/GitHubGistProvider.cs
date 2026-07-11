@@ -4,30 +4,36 @@ using QuickCheck.Util;
 
 namespace QuickCheck.Interfaces;
 
-public class GoogleDocProvider : IListProvider
+public class GitHubGistProvider : IListProvider
 {
-    private readonly HttpClient _httpClient = new HttpClient();
-        
-    // Regex to extract the Document ID. 
-    // It looks for the /d/ and captures all valid ID characters (alphanumeric, dashes, underscores) until the next slash or end of string.
-    private readonly Regex _docIdRegex = new Regex(@"docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)", RegexOptions.Compiled);
-    
+    private readonly HttpClient _httpClient = new();
+
+    // Pattern captures: Group 1 = Username, Group 2 = Gist ID
+    // Works for: 
+    // - https://gist.github.com/username/8a7b6c5d4e3f2a1b
+    // - https://gist.githubusercontent.com/username/8a7b6c5d4e3f2a1b/raw/...
+    private readonly Regex _gistRegex = new Regex(
+        @"gist\.github(?:usercontent)?\.com\/([a-zA-Z0-9_-]+)\/([a-fA-F0-9]+)",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
     public async Task<List<VIPPlayer>> GetPlayers(string providerUrl)
     {
-        if (_docIdRegex.Match(providerUrl) is not { Success: true } match)
+        if (_gistRegex.Match(providerUrl) is not { Success: true } match)
         {
-            throw new ArgumentException("Invalid Google Docs URL.");
+            throw new ArgumentException("Invalid GitHub Gist URL.");
         }
-        
-        var docId = match.Groups[1].Value;
-        
-        var exportUrl = $"https://docs.google.com/document/d/{docId}/export?format=txt";
+
+        var username = match.Groups[1].Value;
+        var gistId = match.Groups[2].Value;
+
+        var rawUrl = $"https://gist.githubusercontent.com/{username}/{gistId}/raw/";
 
         var players = new List<VIPPlayer>();
 
         try
         {
-            var response = await _httpClient.GetAsync(exportUrl);
+            var response = await _httpClient.GetAsync(rawUrl);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
 
@@ -48,19 +54,19 @@ public class GoogleDocProvider : IListProvider
                 else
                 {
                     Services.Log.Warning(
-                        $"Invalid line format in Google Doc: {line}. Expected format: 'Player Name@HomeWorld'.");
+                        $"Invalid line format in GitHub Gist: {line}. Expected format: 'Player Name@HomeWorld'.");
                 }
             }
         }
         catch (HttpRequestException e)
         {
-            Services.Log.Error($"HTTP Error from Google Docs: {e.Message}");
+            Services.Log.Error($"HTTP Error from GitHub Gist: {e.Message}");
         }
         catch (Exception e)
         {
-            Services.Log.Error($"Unexpected error while fetching players from Google Docs: {e.Message}");
+            Services.Log.Error($"Unexpected error while fetching players from GitHub Gist: {e.Message}");
         }
-        
+
         return players;
     }
 }

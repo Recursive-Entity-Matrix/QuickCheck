@@ -4,24 +4,24 @@ using QuickCheck.Util;
 
 namespace QuickCheck.Interfaces;
 
-public class GoogleDocProvider : IListProvider
+public class PastebinProvider : IListProvider
 {
+    public PastebinProvider()
+    {
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "QuickCheck-Plugin/1.0");
+    }
     private readonly HttpClient _httpClient = new HttpClient();
-        
-    // Regex to extract the Document ID. 
-    // It looks for the /d/ and captures all valid ID characters (alphanumeric, dashes, underscores) until the next slash or end of string.
-    private readonly Regex _docIdRegex = new Regex(@"docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)", RegexOptions.Compiled);
-    
+    private readonly Regex _pastebinRegex = new Regex(@"pastebin\.com\/(?:raw\/)?([a-zA-Z0-9]+)", RegexOptions.Compiled);
     public async Task<List<VIPPlayer>> GetPlayers(string providerUrl)
     {
-        if (_docIdRegex.Match(providerUrl) is not { Success: true } match)
+        if (_pastebinRegex.Match(providerUrl) is not { Success: true } match)
         {
-            throw new ArgumentException("Invalid Google Docs URL.");
+            throw new ArgumentException("Invalid Pastebin URL.");
         }
         
-        var docId = match.Groups[1].Value;
+        var pasteId = match.Groups[1].Value;
         
-        var exportUrl = $"https://docs.google.com/document/d/{docId}/export?format=txt";
+        string exportUrl = $"https://pastebin.com/raw/{pasteId}";
 
         var players = new List<VIPPlayer>();
 
@@ -48,17 +48,17 @@ public class GoogleDocProvider : IListProvider
                 else
                 {
                     Services.Log.Warning(
-                        $"Invalid line format in Google Doc: {line}. Expected format: 'Player Name@HomeWorld'.");
+                        $"Invalid line format in Pastebin: {line}. Expected format: 'Player Name@HomeWorld'.");
                 }
             }
         }
         catch (HttpRequestException e)
         {
-            Services.Log.Error($"HTTP Error from Google Docs: {e.Message}");
+            Services.Log.Error($"HTTP Error from Pastebin: {e.Message}");
         }
         catch (Exception e)
         {
-            Services.Log.Error($"Unexpected error while fetching players from Google Docs: {e.Message}");
+            Services.Log.Error($"Unexpected error while fetching players from Pastebin: {e.Message}");
         }
         
         return players;

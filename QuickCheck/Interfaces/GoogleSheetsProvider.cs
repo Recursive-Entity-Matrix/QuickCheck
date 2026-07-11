@@ -8,15 +8,15 @@ namespace QuickCheck.Interfaces;
 
 public class GoogleSheetsProvider : IListProvider
 {
-    private static readonly HttpClient HttpClient = new HttpClient();
+    private readonly HttpClient _httpClient = new HttpClient();
     
     // Regex to extract the Document ID. 
     // It looks for the /d/ and captures all valid ID characters (alphanumeric, dashes, underscores) until the next slash or end of string.
-    private static readonly Regex DocIdRegex = new Regex(@"docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)", RegexOptions.Compiled);
+    private readonly Regex _docIdRegex = new Regex(@"docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)", RegexOptions.Compiled);
     
     public async Task<List<VIPPlayer>> GetPlayers(string providerUrl)
     {
-        if (DocIdRegex.Match(providerUrl) is not { Success: true } match)
+        if (_docIdRegex.Match(providerUrl) is not { Success: true } match)
         {
             throw new ArgumentException("Invalid Google Sheets URL.");
         }
@@ -29,7 +29,7 @@ public class GoogleSheetsProvider : IListProvider
 
         try
         {
-            var response = await HttpClient.GetAsync(exportUrl);
+            var response = await _httpClient.GetAsync(exportUrl);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
 
